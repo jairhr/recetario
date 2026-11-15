@@ -179,6 +179,22 @@ export async function buscarRecetas(q: string): Promise<RecetaResumen[]> {
   return normalizarRecetas(extraerMeals(datos)).map(aResumen);
 }
 
+export async function filtrarPorCategoria(
+  categoria: string,
+): Promise<RecetaResumen[]> {
+  const nombre = categoria.trim();
+
+  if (!nombre) {
+    return [];
+  }
+
+  const datos = await consultarTheMealDB(
+    `filter.php?c=${encodeURIComponent(nombre)}`,
+  );
+
+  return normalizarRecetas(extraerMeals(datos)).map(aResumen);
+}
+
 export async function obtenerReceta(id: string): Promise<Receta | null> {
   const datos = await consultarTheMealDB(
     `lookup.php?i=${encodeURIComponent(id.trim())}`,
