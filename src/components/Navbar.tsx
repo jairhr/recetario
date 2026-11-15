@@ -1,36 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-
-const ENLACES = [
-  { href: "/", etiqueta: "Inicio" },
-  { href: "/recetas", etiqueta: "Recetas" },
-  { href: "/favoritos", etiqueta: "Favoritos" },
-  { href: "/acerca", etiqueta: "Acerca" },
-] as const;
-
-function esEnlaceActivo(pathname: string, href: string): boolean {
-  if (href === "/") {
-    return pathname === "/";
-  }
-
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-function clasesEnlace(activo: boolean, movil: boolean): string {
-  const base = movil
-    ? "block rounded-xl px-4 py-3 text-sm font-medium transition-colors"
-    : "rounded-full px-4 py-2 text-sm font-medium transition-colors";
-
-  return activo
-    ? `${base} bg-orange-100 text-orange-900`
-    : `${base} text-stone-600 hover:bg-stone-200/70 hover:text-stone-900`;
-}
+import { Suspense, useState } from "react";
+import {
+  EnlacesNavegacion,
+  EnlacesNavegacionEsqueleto,
+} from "@/components/EnlacesNavegacion";
 
 export function Navbar() {
-  const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   const cerrarMenu = () => setMenuAbierto(false);
@@ -56,21 +33,9 @@ export function Navbar() {
         </Link>
 
         <ul className="hidden items-center gap-1 md:flex">
-          {ENLACES.map((enlace) => {
-            const activo = esEnlaceActivo(pathname, enlace.href);
-
-            return (
-              <li key={enlace.href}>
-                <Link
-                  href={enlace.href}
-                  aria-current={activo ? "page" : undefined}
-                  className={clasesEnlace(activo, false)}
-                >
-                  {enlace.etiqueta}
-                </Link>
-              </li>
-            );
-          })}
+          <Suspense fallback={<EnlacesNavegacionEsqueleto />}>
+            <EnlacesNavegacion />
+          </Suspense>
         </ul>
 
         <button
@@ -117,22 +82,13 @@ export function Navbar() {
           className="border-t border-stone-200 bg-stone-50 md:hidden"
         >
           <ul className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-4 py-3 sm:px-6">
-            {ENLACES.map((enlace) => {
-              const activo = esEnlaceActivo(pathname, enlace.href);
-
-              return (
-                <li key={enlace.href}>
-                  <Link
-                    href={enlace.href}
-                    onClick={cerrarMenu}
-                    aria-current={activo ? "page" : undefined}
-                    className={clasesEnlace(activo, true)}
-                  >
-                    {enlace.etiqueta}
-                  </Link>
-                </li>
-              );
-            })}
+            <Suspense
+              fallback={
+                <EnlacesNavegacionEsqueleto movil onNavigate={cerrarMenu} />
+              }
+            >
+              <EnlacesNavegacion movil onNavigate={cerrarMenu} />
+            </Suspense>
           </ul>
         </div>
       )}
