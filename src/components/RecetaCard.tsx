@@ -17,7 +17,7 @@ export function RecetaCard({
 }: RecetaCardProps) {
   return (
     <article className="group relative h-full overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
-      <Link href={`/recetas/${receta.id}`} className="flex h-full flex-col">
+      <Link href={`/recetas/${receta.id}`} className="flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 rounded-2xl">
         <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
           {receta.imagen ? (
             <Image

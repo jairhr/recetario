@@ -59,7 +59,7 @@ export default async function RecetaPage({
     <article className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <Link
         href="/recetas"
-        className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-stone-600 transition-colors hover:text-orange-700"
+        className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-stone-600 transition-colors hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 rounded"
       >
         <span aria-hidden="true">←</span> Volver a recetas
       </Link>

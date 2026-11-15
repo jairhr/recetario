@@ -18,7 +18,7 @@ export function Footer() {
               <li key={enlace.href}>
                 <Link
                   href={enlace.href}
-                  className="inline-flex min-h-11 items-center transition-colors hover:text-orange-700"
+                  className="inline-flex min-h-11 items-center transition-colors hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 rounded"
                 >
                   {enlace.etiqueta}
                 </Link>

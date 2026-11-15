@@ -50,7 +50,7 @@ export default function Home() {
             </Link>
             <Link
               href="/favoritos"
-              className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white/80 px-6 py-3 text-sm font-semibold text-stone-700 transition-colors hover:border-stone-400 hover:bg-white"
+              className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white/80 px-6 py-3 text-sm font-semibold text-stone-700 transition-colors hover:border-stone-400 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
             >
               Ver favoritos
             </Link>
@@ -70,7 +70,7 @@ export default function Home() {
           </div>
           <Link
             href="/recetas"
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-orange-700 transition-colors hover:text-orange-800"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-orange-700 transition-colors hover:text-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 rounded"
           >
             Ver todas las recetas <span aria-hidden="true">→</span>
           </Link>
