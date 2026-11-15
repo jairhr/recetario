@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { BotonFavorito } from "@/components/BotonFavorito";
 import type { RecetaResumen } from "@/types/receta";
 
 interface RecetaCardProps {
@@ -8,7 +9,7 @@ interface RecetaCardProps {
 
 export function RecetaCard({ receta }: RecetaCardProps) {
   return (
-    <article className="group h-full overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+    <article className="group relative h-full overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/recetas/${receta.id}`} className="flex h-full flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
           {receta.imagen ? (
@@ -34,6 +35,10 @@ export function RecetaCard({ receta }: RecetaCardProps) {
           </span>
         </div>
       </Link>
+
+      <div className="absolute right-3 top-3 z-10">
+        <BotonFavorito recetaId={receta.id} nombre={receta.nombre} />
+      </div>
     </article>
   );
 }

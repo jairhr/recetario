@@ -39,6 +39,70 @@ No generes código todavía. Confirma que entendiste las reglas y actualiza AGEN
 - Se mantuvo la regla de tipos compartidos en `src/types/` y el uso de `unknown` con narrowing en lugar de `any`.
 - Se dejó constancia de que el proyecto usa Next.js 16.4.6 con `cacheComponents` y `partialPrefetching` activos, por lo que no deben añadirse configuraciones de segmento como `dynamic`, `revalidate`, `fetchCache`, `dynamicParams` o `runtime`.
 
+## Iteración 2 — Tipos, Route Handlers y portada
+
+**Objetivo:** Construir la capa de datos y la primera pantalla de la aplicación.
+
+**Prompt (resumen):** Definir los tipos de receta, el cliente de TheMealDB y Route Handlers propios bajo `src/app/api`; crear el layout global, Navbar, Footer y la portada con la receta del día, incluyendo `loading.tsx` y `error.tsx`.
+
+**Resultado:** `src/types/receta.ts`, `src/lib/mealdb.ts` (normalización, búsqueda, filtro por categoría y `recetaAleatoria()`), `src/lib/api.ts` y cuatro Route Handlers (`/api/recetas`, `/api/recetas/[id]`, `/api/recetas/aleatoria`, `/api/categorias`). Layout, Navbar, Footer, `RecetaCard` y portada con la receta del día dentro de `<Suspense>`.
+
+**Correcciones / decisiones técnicas:**
+
+- Las imágenes remotas se limitaron a `https://www.themealdb.com/images/**` en `images.remotePatterns`.
+- La fuente de datos se normaliza en el servidor; el navegador solo recibe el tipo `Receta`/`RecetaResumen`.
+- Se documentaron las variables en `.env.example` y se añadió la excepción `!.env.example` a `.gitignore`.
+
+## Iteración 3 — Listado con búsqueda y filtro
+
+**Objetivo:** Implementar `/recetas` con búsqueda por nombre y filtro por categoría.
+
+**Prompt (resumen):** Página de listado que lea `searchParams` (Promise en Next 16) dentro de `<Suspense>`, combine búsqueda y categoría, muestre estado vacío y tenga `loading.tsx`/`error.tsx`.
+
+**Resultado:** `src/app/recetas/page.tsx` con filtro por categoría vía `filter.php`, búsqueda combinada en servidor, `BuscadorRecetas` con debounce de 400 ms y `router.replace`, y `GrillaEsqueleto` compartido para los estados de carga.
+
+**Correcciones / decisiones técnicas:**
+
+- `searchParams` debe resolverse dentro de `<Suspense>` para no bloquear el prerenderizado con Cache Components.
+- Las navegaciones del buscador se guardan en estado porque las refs no pueden leerse durante el render (`react-hooks/refs`).
+- El filtro de categoría por defecto es `chicken` para que la primera visita tenga contenido.
+
+## Iteración 4 — Detalle de receta
+
+**Objetivo:** Implementar `/recetas/[id]` con ingredientes, pasos y metadata dinámica.
+
+**Prompt (resumen):** Server Component que obtenga la receta por id (`params` es una Promise), use `notFound()` si no existe, muestre imagen, nombre, categoría, región, ingredientes con medidas, instrucciones numeradas y YouTube; añadir `generateMetadata`, `not-found.tsx`, `loading.tsx`, `error.tsx` y dejar un hueco para el botón de favoritos.
+
+**Resultado:** Página de detalle completa, `not-found.tsx`, `loading.tsx` y `error.tsx` propios. `generateMetadata` devuelve título, descripción y Open Graph con la imagen de la receta.
+
+**Correcciones / decisiones técnicas:**
+
+- El build falló porque `usePathname()` en el Navbar no puede prerenderizarse fuera de `<Suspense>` en una ruta dinámica. Los enlaces dependientes del pathname se movieron a `EnlacesNavegacion`, envuelto en `<Suspense>` con un fallback estático.
+- Con `loading.tsx` el shell se transmite antes de resolver la receta, así que el 404 visual llega con HTTP 200; es el comportamiento documentado de Next.js con streaming.
+
+## Iteración 5 — Favoritos y Acerca
+
+**Objetivo:** Persistir favoritos en el navegador y documentar el proyecto y su flujo de Vibe Coding.
+
+**Prompt utilizado:**
+
+```text
+Tarea: favoritos y página acerca.
+1. src/hooks/useFavoritos.ts: hook que guarda los ids de favoritos en localStorage usando useState y useEffect (con cuidado de hidratación: leer localStorage solo en el cliente).
+2. src/components/BotonFavorito.tsx (Client Component) y colócalo en la tarjeta y en el detalle.
+3. src/app/favoritos/page.tsx: Client Component que lee los ids favoritos, obtiene cada receta desde /api/recetas/[id] y las muestra con RecetaCard. Estados: cargando, vacío y error.
+4. src/app/acerca/page.tsx (Server Component): descripción del proyecto, tecnologías usadas y mención del flujo de Vibe Coding con opencode.
+```
+
+**Resultado:** `useFavoritos` con persistencia en `localStorage`, sincronización entre componentes y eventos `storage`; `BotonFavorito` con variantes tarjeta y detalle; botón integrado en `RecetaCard` y en `/recetas/[id]`; `/favoritos` con estados de carga, vacío, error y reintento; `/acerca` con descripción, tecnologías, flujo de Vibe Coding y explicación del flujo de datos.
+
+**Correcciones / decisiones técnicas:**
+
+- La lectura inicial de `localStorage` se difiere con `setTimeout(..., 0)` porque el lint de React 19 rechaza `setState` síncrono dentro de un efecto y la lectura directa rompería la hidratación.
+- Los favoritos se sincronizan entre componentes con un evento propio (`recetario:favoritos:cambio`) además del evento nativo `storage`.
+- `/favoritos` deriva el estado de carga y error comparando una clave de favoritos, evitando `setState` síncrono dentro del efecto.
+- `GrillaRecetas` se extrajo para compartir la misma cuadrícula responsive entre `/recetas` y `/favoritos`.
+
 ## Desafíos y cómo se resolvieron
 
 - **`.env.example` estaba siendo ignorado:** `.gitignore` usa el patrón `.env*`, que también excluye `.env.example`. Se documentó la necesidad de agregar una excepción `!.env.example` (o usar `git add -f`) para que la plantilla sí se versione.

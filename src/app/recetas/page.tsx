@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { BuscadorRecetas } from "@/components/BuscadorRecetas";
 import { GrillaEsqueleto } from "@/components/GrillaEsqueleto";
-import { RecetaCard } from "@/components/RecetaCard";
+import { GrillaRecetas } from "@/components/GrillaRecetas";
 import {
   buscarRecetas,
   filtrarPorCategoria,
@@ -101,18 +101,6 @@ function EstadoVacio({ filtros }: { filtros: Filtros }) {
         Ver todas las sugerencias
       </Link>
     </div>
-  );
-}
-
-function GrillaRecetas({ recetas }: { recetas: RecetaResumen[] }) {
-  return (
-    <ul className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {recetas.map((receta) => (
-        <li key={receta.id} className="h-full">
-          <RecetaCard receta={receta} />
-        </li>
-      ))}
-    </ul>
   );
 }
 

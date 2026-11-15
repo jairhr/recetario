@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BotonFavorito } from "@/components/BotonFavorito";
 import { obtenerReceta } from "@/lib/mealdb";
 
 function dividirPasos(instrucciones: string): string[] {
@@ -98,8 +99,13 @@ export default async function RecetaPage({
             {receta.nombre}
           </h1>
 
-          {/* Espacio reservado para el botón de favoritos (siguiente iteración). */}
-          <div data-slot="boton-favorito" className="mt-6" />
+          <div data-slot="boton-favorito" className="mt-6">
+            <BotonFavorito
+              recetaId={receta.id}
+              nombre={receta.nombre}
+              variante="detalle"
+            />
+          </div>
 
           {tieneYoutube && (
             <a
