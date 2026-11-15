@@ -1,69 +1,82 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
+import { RecetaCard } from "@/components/RecetaCard";
+import { recetaAleatoria } from "@/lib/mealdb";
+
+async function RecetaDelDia() {
+  const receta = await recetaAleatoria();
+
+  return <RecetaCard receta={receta} />;
+}
+
+function RecetaDelDiaEsqueleto() {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <div className="aspect-[4/3] animate-pulse bg-stone-200" />
+      <div className="space-y-3 p-4">
+        <div className="h-5 w-3/4 animate-pulse rounded bg-stone-200" />
+        <div className="h-4 w-1/3 animate-pulse rounded bg-stone-200" />
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <>
+      <section className="relative overflow-hidden border-b border-stone-200 bg-linear-to-br from-amber-100 via-orange-50 to-rose-100">
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+          <span className="rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-orange-800 ring-1 ring-orange-200">
+            Cocina simple, sabores de casa
+          </span>
+          <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl lg:text-6xl">
+            Encuentra tu próxima receta favorita
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="max-w-xl text-base text-stone-600 sm:text-lg">
+            Explora recetas de todo el mundo, revisa sus ingredientes paso a
+            paso y guarda las que más te gusten.
           </p>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Link
+              href="/recetas"
+              className="inline-flex items-center justify-center rounded-full bg-orange-700 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
+            >
+              Explorar recetas
+            </Link>
+            <Link
+              href="/favoritos"
+              className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white/80 px-6 py-3 text-sm font-semibold text-stone-700 transition-colors hover:border-stone-400 hover:bg-white"
+            >
+              Ver favoritos
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
+              Receta del día
+            </h2>
+            <p className="mt-1 text-sm text-stone-600">
+              Una sugerencia aleatoria para inspirar tu próxima comida.
+            </p>
+          </div>
+          <Link
+            href="/recetas"
+            className="text-sm font-semibold text-orange-700 transition-colors hover:text-orange-800"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Ver todas las recetas <span aria-hidden="true">→</span>
+          </Link>
         </div>
-      </main>
-    </div>
+
+        <div className="mt-8 max-w-md">
+          <Suspense fallback={<RecetaDelDiaEsqueleto />}>
+            <RecetaDelDia />
+          </Suspense>
+        </div>
+      </section>
+    </>
   );
 }
