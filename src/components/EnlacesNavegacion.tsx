@@ -20,8 +20,8 @@ function esEnlaceActivo(pathname: string, href: string): boolean {
 
 function clasesEnlace(activo: boolean, movil: boolean): string {
   const base = movil
-    ? "block rounded-xl px-4 py-3 text-sm font-medium transition-colors"
-    : "rounded-full px-4 py-2 text-sm font-medium transition-colors";
+    ? "flex min-h-11 items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors"
+    : "inline-flex min-h-11 items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition-colors";
 
   return activo
     ? `${base} bg-orange-100 text-orange-900`

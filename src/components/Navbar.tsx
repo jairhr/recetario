@@ -21,7 +21,7 @@ export function Navbar() {
         <Link
           href="/"
           onClick={cerrarMenu}
-          className="flex items-center gap-2 text-lg font-bold tracking-tight text-stone-900"
+          className="flex min-h-11 items-center gap-2 text-lg font-bold tracking-tight text-stone-900"
         >
           <span
             aria-hidden="true"
@@ -40,7 +40,7 @@ export function Navbar() {
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-stone-700 transition-colors hover:bg-stone-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full text-stone-700 transition-colors hover:bg-stone-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 md:hidden"
           aria-expanded={menuAbierto}
           aria-controls="menu-movil"
           aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}

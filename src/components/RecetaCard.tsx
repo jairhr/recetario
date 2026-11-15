@@ -3,11 +3,18 @@ import Link from "next/link";
 import { BotonFavorito } from "@/components/BotonFavorito";
 import type { RecetaResumen } from "@/types/receta";
 
+const SIZES_GRILLA =
+  "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw";
+
 interface RecetaCardProps {
   receta: RecetaResumen;
+  sizes?: string;
 }
 
-export function RecetaCard({ receta }: RecetaCardProps) {
+export function RecetaCard({
+  receta,
+  sizes = SIZES_GRILLA,
+}: RecetaCardProps) {
   return (
     <article className="group relative h-full overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/recetas/${receta.id}`} className="flex h-full flex-col">
@@ -15,19 +22,19 @@ export function RecetaCard({ receta }: RecetaCardProps) {
           {receta.imagen ? (
             <Image
               src={receta.imagen}
-              alt={receta.nombre}
+              alt={`Fotografía de ${receta.nombre}`}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+              sizes={sizes}
               className="object-cover transition duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-stone-500">
+            <div className="flex h-full items-center justify-center text-sm text-stone-600">
               Sin imagen disponible
             </div>
           )}
         </div>
         <div className="flex flex-1 flex-col justify-between gap-3 p-4">
-          <h3 className="line-clamp-2 text-lg font-semibold leading-snug text-stone-900">
+          <h3 className="line-clamp-2 break-words text-lg font-semibold leading-snug text-stone-900">
             {receta.nombre}
           </h3>
           <span className="text-sm font-semibold text-orange-700">

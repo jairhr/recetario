@@ -6,7 +6,12 @@ import { recetaAleatoria } from "@/lib/mealdb";
 async function RecetaDelDia() {
   const receta = await recetaAleatoria();
 
-  return <RecetaCard receta={receta} />;
+  return (
+    <RecetaCard
+      receta={receta}
+      sizes="(max-width: 768px) 100vw, 448px"
+    />
+  );
 }
 
 function RecetaDelDiaEsqueleto() {
@@ -65,7 +70,7 @@ export default function Home() {
           </div>
           <Link
             href="/recetas"
-            className="text-sm font-semibold text-orange-700 transition-colors hover:text-orange-800"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-orange-700 transition-colors hover:text-orange-800"
           >
             Ver todas las recetas <span aria-hidden="true">→</span>
           </Link>

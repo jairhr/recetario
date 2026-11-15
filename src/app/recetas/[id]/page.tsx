@@ -59,7 +59,7 @@ export default async function RecetaPage({
     <article className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <Link
         href="/recetas"
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-600 transition-colors hover:text-orange-700"
+        className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-stone-600 transition-colors hover:text-orange-700"
       >
         <span aria-hidden="true">←</span> Volver a recetas
       </Link>
@@ -69,13 +69,13 @@ export default async function RecetaPage({
           {receta.imagen ? (
             <Image
               src={receta.imagen}
-              alt={receta.nombre}
+              alt={`Fotografía de ${receta.nombre}`}
               fill
-              sizes="(max-width: 1024px) 100vw, 55vw"
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-stone-500">
+            <div className="flex h-full items-center justify-center text-sm text-stone-600">
               Sin imagen disponible
             </div>
           )}
@@ -95,7 +95,7 @@ export default async function RecetaPage({
             )}
           </div>
 
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl">
+          <h1 className="mt-4 break-words text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl">
             {receta.nombre}
           </h1>
 
@@ -112,7 +112,7 @@ export default async function RecetaPage({
               href={receta.youtube}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:border-red-300 hover:text-red-700"
+              className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:border-red-300 hover:text-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
             >
               <span aria-hidden="true">▶</span> Ver en YouTube
               <span aria-hidden="true">↗</span>
@@ -137,10 +137,10 @@ export default async function RecetaPage({
                   key={`${ingrediente.ingrediente}-${indice}`}
                   className="flex items-baseline justify-between gap-4 px-4 py-3 text-sm"
                 >
-                  <span className="font-medium text-stone-800">
+                  <span className="min-w-0 break-words font-medium text-stone-800">
                     {ingrediente.ingrediente}
                   </span>
-                  <span className="text-right text-stone-500">
+                  <span className="min-w-0 break-words text-right text-stone-500">
                     {ingrediente.medida || "Al gusto"}
                   </span>
                 </li>
@@ -171,7 +171,9 @@ export default async function RecetaPage({
                   >
                     {indice + 1}
                   </span>
-                  <p className="text-sm leading-7 text-stone-700">{paso}</p>
+                  <p className="break-words text-sm leading-7 text-stone-700">
+                    {paso}
+                  </p>
                 </li>
               ))}
             </ol>

@@ -128,7 +128,7 @@ export function BuscadorRecetas({
               onChange={(evento) => setTexto(evento.target.value)}
               placeholder="Ej. pasta, chicken, curry…"
               autoComplete="off"
-              className="w-full rounded-full border border-stone-300 bg-stone-50 py-3 pl-11 pr-4 text-sm text-stone-900 placeholder:text-stone-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="w-full rounded-full border border-stone-300 bg-stone-50 py-3 pl-11 pr-4 text-sm text-stone-900 placeholder:text-stone-500 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
           </div>
         </div>

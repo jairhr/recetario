@@ -45,7 +45,7 @@ export function BotonFavorito({
             ? `Quitar ${nombre} de favoritos`
             : `Añadir ${nombre} a favoritos`
         }
-        className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors ${
+        className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 ${
           activo
             ? "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
             : "border-stone-300 bg-white text-stone-700 hover:border-rose-300 hover:text-rose-700"
@@ -66,7 +66,7 @@ export function BotonFavorito({
         activo ? `Quitar ${nombre} de favoritos` : `Añadir ${nombre} a favoritos`
       }
       title={activo ? "Quitar de favoritos" : "Añadir a favoritos"}
-      className={`grid h-9 w-9 place-items-center rounded-full border shadow-sm backdrop-blur transition-colors ${
+      className={`grid h-11 w-11 place-items-center rounded-full border shadow-sm backdrop-blur transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 ${
         activo
           ? "border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100"
           : "border-stone-200 bg-white/90 text-stone-600 hover:bg-white hover:text-rose-600"
