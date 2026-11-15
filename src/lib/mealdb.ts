@@ -21,18 +21,32 @@ function obtenerBaseUrl(): string {
   return (configurada || MEALDB_API_URL_POR_DEFECTO).replace(/\/+$/, "");
 }
 
+const TIMEOUT_MS = 8_000;
+
 async function consultarTheMealDB(recurso: string): Promise<unknown> {
+  const controlador = new AbortController();
+  const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS);
+
   let respuesta: Response;
 
   try {
     respuesta = await fetch(`${obtenerBaseUrl()}/${recurso}`, {
       cache: "no-store",
+      signal: controlador.signal,
       headers: {
         Accept: "application/json",
       },
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new MealDBError(
+        "TheMealDB no respondió en el tiempo esperado (8 s).",
+      );
+    }
+
     throw new MealDBError("No se pudo conectar con TheMealDB.");
+  } finally {
+    clearTimeout(temporizador);
   }
 
   if (!respuesta.ok) {

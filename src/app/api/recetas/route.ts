@@ -2,12 +2,21 @@ import type { NextRequest } from "next/server";
 import { respuestaError } from "@/lib/api";
 import { buscarRecetas } from "@/lib/mealdb";
 
+const Q_MAX = 200;
+
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams.get("q")?.trim() ?? "";
 
   if (!q) {
     return Response.json(
       { error: "El parámetro q es obligatorio." },
+      { status: 400 },
+    );
+  }
+
+  if (q.length > Q_MAX) {
+    return Response.json(
+      { error: `El parámetro q no puede superar ${Q_MAX} caracteres.` },
       { status: 400 },
     );
   }

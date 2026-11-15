@@ -11,6 +11,8 @@ import type { RecetaResumen } from "@/types/receta";
 interface Resultado {
   clave: string;
   recetas: RecetaResumen[];
+  /** IDs de favoritos que no se pudieron cargar individualmente. */
+  fallidas: string[];
 }
 
 interface Fallo {
@@ -136,19 +138,36 @@ export function FavoritosContenido() {
     let cancelado = false;
 
     async function cargar() {
-      try {
-        const recetasCargadas = await Promise.all(ids.map(obtenerResumen));
+      // allSettled garantiza que un fallo individual no cancele las demás.
+      const resultados = await Promise.allSettled(ids.map(obtenerResumen));
 
-        if (!cancelado) {
-          setResultado({ clave: claveActual, recetas: recetasCargadas });
+      if (cancelado) {
+        return;
+      }
+
+      const recetasCargadas: RecetaResumen[] = [];
+      const idsFallidas: string[] = [];
+
+      resultados.forEach((resultado, indice) => {
+        if (resultado.status === "fulfilled") {
+          recetasCargadas.push(resultado.value);
+        } else {
+          idsFallidas.push(ids[indice]);
         }
-      } catch {
-        if (!cancelado) {
-          setFallo({
-            clave: claveActual,
-            mensaje: "Revisa tu conexión e inténtalo de nuevo.",
-          });
-        }
+      });
+
+      if (recetasCargadas.length === 0 && idsFallidas.length > 0) {
+        // Todas fallaron: mostramos el estado de error completo.
+        setFallo({
+          clave: claveActual,
+          mensaje: "Revisa tu conexión e inténtalo de nuevo.",
+        });
+      } else {
+        setResultado({
+          clave: claveActual,
+          recetas: recetasCargadas,
+          fallidas: idsFallidas,
+        });
       }
     }
 
@@ -179,15 +198,42 @@ export function FavoritosContenido() {
     contenido = <GrillaRecetas recetas={recetas} />;
   }
 
+  const totalCargadas = recetas?.length ?? 0;
+  const totalFallidas = recetas !== null ? (resultado?.fallidas.length ?? 0) : 0;
+
   return (
     <section className="mt-8" aria-live="polite">
       {hidratado && favoritos.length > 0 && recetas ? (
         <p className="mb-4 text-sm font-medium text-stone-600">
-          {favoritos.length === 1
+          {totalCargadas === 1
             ? "1 receta guardada"
-            : `${favoritos.length} recetas guardadas`}
+            : `${totalCargadas} recetas guardadas`}
         </p>
       ) : null}
+
+      {totalFallidas > 0 ? (
+        <div
+          role="alert"
+          className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          <span aria-hidden="true" className="mt-0.5 shrink-0 text-base">
+            ⚠️
+          </span>
+          <p>
+            {totalFallidas === 1
+              ? "1 receta no se pudo cargar y se omitió."
+              : `${totalFallidas} recetas no se pudieron cargar y se omitieron.`}{" "}
+            <button
+              type="button"
+              onClick={reintentar}
+              className="font-semibold underline underline-offset-2 hover:text-amber-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
+            >
+              Reintentar
+            </button>
+          </p>
+        </div>
+      ) : null}
+
       {contenido}
     </section>
   );
