@@ -103,6 +103,24 @@ Tarea: favoritos y página acerca.
 - `/favoritos` deriva el estado de carga y error comparando una clave de favoritos, evitando `setState` síncrono dentro del efecto.
 - `GrillaRecetas` se extrajo para compartir la misma cuadrícula responsive entre `/recetas` y `/favoritos`.
 
+## Iteración 6 — Cierre y commit de la entrega
+
+**Objetivo:** Versionar en un único commit la implementación de favoritos con `localStorage`, la página Acerca y la actualización de esta bitácora, dejando el árbol de trabajo limpio.
+
+**Prompt utilizado:**
+
+```text
+git add . && git commit -m "feat: favoritos con localStorage y página acerca"
+```
+
+**Resultado:** Se creó el commit `0214cb6` con 11 archivos modificados o nuevos (774 inserciones y 16 eliminaciones), incluida esta bitácora. `git status` quedó limpio. No se hizo push.
+
+**Correcciones / decisiones técnicas:**
+
+- El commit se hizo después de que lint, typecheck y build pasaran y de verificar el flujo de favoritos en el navegador.
+- La bitácora se incluyó en el mismo commit que el código para que la entrega quede autocontenida.
+- Se mantuvo un commit por iteración funcional en lugar de separar la documentación en otro commit.
+
 ## Desafíos y cómo se resolvieron
 
 - **`.env.example` estaba siendo ignorado:** `.gitignore` usa el patrón `.env*`, que también excluye `.env.example`. Se documentó la necesidad de agregar una excepción `!.env.example` (o usar `git add -f`) para que la plantilla sí se versione.
@@ -110,3 +128,4 @@ Tarea: favoritos y página acerca.
 - **Next.js 16 reescribe `AGENTS.md`:** el bloque de reglas para agentes se regenera con `next dev`. En lugar de eliminarlo o duplicarlo, se preservó y se añadió el contenido propio debajo.
 - **Sin runner de tests ni script de typecheck:** el proyecto solo trae `dev`, `build` y `lint`. Se documentó el comando `npx next typegen && npx tsc --noEmit` para verificar tipos y se aclaró que no hay pruebas automatizadas configuradas.
 - **Bloqueo de PowerShell sobre `npm.ps1`/`npx.ps1`:** en este entorno de Windows los shims de PowerShell pueden estar bloqueados por la política de ejecución. Se documentó el uso de `npm.cmd`, `npx.cmd` o `cmd /c "npm ..."` como alternativa.
+- **Advertencias LF → CRLF al hacer `git add`:** Git avisó de que los archivos con LF se convertirían a CRLF la próxima vez que los tocara. Son advertencias normales en Windows por `core.autocrlf`, no errores; no alteran el contenido y se dejaron tal cual para no generar ruido de finales de línea.
