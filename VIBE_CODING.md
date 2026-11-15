@@ -121,6 +121,96 @@ git add . && git commit -m "feat: favoritos con localStorage y página acerca"
 - La bitácora se incluyó en el mismo commit que el código para que la entrega quede autocontenida.
 - Se mantuvo un commit por iteración funcional en lugar de separar la documentación en otro commit.
 
+## Iteración 7 — Auditoría de arquitectura
+
+**Objetivo:** Auditar toda la arquitectura del proyecto sin cambiar funcionalidad: clasificar componentes Server/Client, detectar `"use client"` innecesarios, verificar que ninguna página Server llame a rutas `/api` propias, confirmar cobertura de `loading.tsx`/`error.tsx` y ausencia de `any`.
+
+**Prompt utilizado:**
+
+```text
+Explica en 3-5 líneas tu plan antes de codificar.
+
+Tarea: auditar la arquitectura del proyecto sin cambiar funcionalidad.
+1. Revisa todos los archivos en src/ y lista en una tabla qué componentes son Server y cuáles Client, con una justificación de una línea por cada "use client".
+2. Detecta "use client" innecesarios y muévelos lo más abajo posible en el árbol (por ejemplo, que solo el botón interactivo sea Client y no toda la tarjeta o página).
+3. Verifica que ninguna página Server haga fetch HTTP a nuestras propias rutas /api (deben usar src/lib directamente) y que no haya ningún `any`.
+4. Verifica que cada ruta con datos (/recetas, /recetas/[id], /favoritos) tenga loading.tsx y error.tsx, y que app/not-found.tsx exista.
+5. Corrige lo que encuentres y reporta los cambios hechos.
+```
+
+**Resultado:** Auditoría completa de los 29 archivos de `src/`. No se modificó ningún archivo: la arquitectura ya cumplía todas las reglas. Se generó un reporte en tabla con la clasificación Server/Client y justificación de cada `"use client"`. La única observación de mejora futura documentada fue considerar un endpoint batch para favoritos (no urgente).
+
+**Correcciones / decisiones técnicas:**
+
+- Se confirmó que el único `fetch('/api/...')` propio existe en `FavoritosContenido`, que es un **Client Component** — no es una violación porque depende de IDs del `localStorage` que solo existen en el browser. `mealdb.ts` usa `process.env` y no puede ejecutarse en el browser.
+- Se verificó que `"use client"` en `Navbar` es necesario (`useState` para el menú hamburguesa) y que `EnlacesNavegacion` está correctamente separado como Client Island con `<Suspense>`, reduciendo al mínimo la superficie Client.
+- Se constató que `any` solo aparecía dentro de un string literal de UI en `acerca/page.tsx`, no como tipo TypeScript.
+- El shell de Windows (PowerShell) no puede leer rutas con corchetes (`[id]`) directamente en `Get-Content`; se usó `read_file` para acceder a esos archivos.
+
+---
+
+## Iteración 8 — Revisión responsive y de experiencia de usuario
+
+**Objetivo:** Revisar la UI en anchos 375 px, 768 px y 1280 px; garantizar touch targets ≥ 44 px; añadir `focus-visible` y `aria-label` en todos los elementos interactivos; verificar contraste y uso correcto de `next/image`.
+
+**Prompt utilizado:**
+
+```text
+Explica en 3-5 líneas tu plan antes de codificar.
+
+Tarea: revisión responsive y de experiencia de usuario.
+1. Revisa en anchos 375px, 768px y 1280px: navbar, grilla de recetas, detalle, favoritos y formulario de búsqueda. Corrige desbordes horizontales, textos cortados e imágenes deformadas.
+2. Los elementos táctiles deben medir al menos 44px de alto.
+3. Añade estados focus-visible y aria-label en botones solo con icono (hamburguesa, favorito).
+4. Asegura contraste de texto suficiente y que las imágenes usen next/image con alt descriptivo y sizes adecuados.
+5. Mantén la paleta cálida actual y no agregues librerías nuevas.
+```
+
+**Resultado:** Auditoría responsive completa. Touch targets, `aria-label`, imágenes y contraste ya estaban correctos. Se detectó y corrigió la ausencia de `focus-visible:outline` en 11 archivos: los enlaces secundarios (volver, ver favoritos, links de nav, footer, error pages, not-found, acerca) carecían del anillo de foco naranja que sí tenían los botones principales. 15 líneas modificadas en 11 archivos; lint y typecheck limpios.
+
+**Correcciones / decisiones técnicas:**
+
+- La función `clasesEnlace()` en `EnlacesNavegacion.tsx` generaba las clases para los 4 links del nav tanto en desktop como en móvil; añadir `focus-visible:` ahí los cubrió todos de una sola edición.
+- El `<Link>` que envuelve `RecetaCard` completa no tenía foco visible; se añadió `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 rounded-2xl` para que el anillo respete el radio de la tarjeta.
+- Los error pages (`app/error.tsx`, `recetas/error.tsx`, `favoritos/error.tsx`, `recetas/[id]/error.tsx`) tenían `focus-visible` en el botón "Reintentar" pero no en el link "Volver".
+- El texto `text-stone-500` solo se usa en placeholders, que están exentos del requisito de contraste WCAG; los textos de contenido usan `text-stone-600` (≈ 5.9:1 sobre blanco) o superior.
+
+---
+
+## Iteración 9 — Endurecimiento del manejo de errores
+
+**Objetivo:** Añadir timeout al cliente HTTP, validar parámetros en Route Handlers, y hacer que favoritos muestre las recetas que sí cargan cuando alguna falla individualmente.
+
+**Prompt utilizado:**
+
+```text
+Explica en 3-5 líneas tu plan antes de codificar.
+
+Tarea: endurecer el manejo de errores.
+1. En src/lib/mealdb.ts: agrega timeout al fetch (AbortController, 8 s) y lanza errores tipados con mensaje claro cuando TheMealDB falle o devuelva una respuesta inesperada.
+2. En los Route Handlers: valida parámetros (q con longitud máxima razonable, id numérico) y devuelve 400/404/502 según corresponda con un JSON { error: string }.
+3. En favoritos: si una receta falla al cargar, mostrar las demás y un aviso, sin romper toda la página.
+4. Agrega un script o comentario con los casos probados manualmente.
+```
+
+**Resultado:** Cuatro archivos modificados y `TESTING.md` creado.
+
+- `mealdb.ts`: `AbortController` con timeout de 8 s; distingue timeout de error de red con mensajes distintos; `clearTimeout` en `finally`.
+- `api/recetas/route.ts`: validación de longitud máxima de `q` (200 chars) → HTTP 400.
+- `api/recetas/[id]/route.ts`: validación con regex `/^\d{1,8}$/`; IDs no numéricos (strings, scripts) → HTTP 400.
+- `FavoritosContenido.tsx`: `Promise.all` → `Promise.allSettled`; recetas que sí cargan se muestran; banner ámbar con `role="alert"` lista cuántas fallaron y ofrece reintentar; solo si **todas** fallan se muestra el `EstadoError` completo; el contador refleja las recetas cargadas, no el total de favoritos.
+- `TESTING.md`: comandos `curl` para los tres casos de validación de API y tabla con instrucciones de DevTools para los casos de favoritos parciales.
+
+**Correcciones / decisiones técnicas:**
+
+- Se usó `DOMException` con `name === "AbortError"` para distinguir el abort del timeout de cualquier otro error de red, ya que `AbortController.abort()` lanza ese tipo específico.
+- La regex de validación de ID es `/^\d{1,8}$/` — TheMealDB usa IDs numéricos de hasta 6 dígitos; 8 es el techo conservador para no romper si el proveedor amplía su rango.
+- `Promise.allSettled` nunca rechaza; el bloque `try/catch` alrededor del `cargar()` anterior se eliminó y la lógica de error total se detecta con `recetasCargadas.length === 0 && idsFallidas.length > 0`.
+- El aviso de fallos parciales usa `role="alert"` para que lectores de pantalla lo anuncien automáticamente cuando aparece.
+- El contador de "N recetas guardadas" ahora muestra `totalCargadas` (recetas resueltas con éxito) en lugar de `favoritos.length` (IDs en localStorage), evitando mostrar un número incorrecto cuando hay fallos parciales.
+
+---
+
 ## Desafíos y cómo se resolvieron
 
 - **`.env.example` estaba siendo ignorado:** `.gitignore` usa el patrón `.env*`, que también excluye `.env.example`. Se documentó la necesidad de agregar una excepción `!.env.example` (o usar `git add -f`) para que la plantilla sí se versione.
@@ -129,3 +219,6 @@ git add . && git commit -m "feat: favoritos con localStorage y página acerca"
 - **Sin runner de tests ni script de typecheck:** el proyecto solo trae `dev`, `build` y `lint`. Se documentó el comando `npx next typegen && npx tsc --noEmit` para verificar tipos y se aclaró que no hay pruebas automatizadas configuradas.
 - **Bloqueo de PowerShell sobre `npm.ps1`/`npx.ps1`:** en este entorno de Windows los shims de PowerShell pueden estar bloqueados por la política de ejecución. Se documentó el uso de `npm.cmd`, `npx.cmd` o `cmd /c "npm ..."` como alternativa.
 - **Advertencias LF → CRLF al hacer `git add`:** Git avisó de que los archivos con LF se convertirían a CRLF la próxima vez que los tocara. Son advertencias normales en Windows por `core.autocrlf`, no errores; no alteran el contenido y se dejaron tal cual para no generar ruido de finales de línea.
+- **PowerShell no puede leer rutas con corchetes en `Get-Content`:** los segmentos dinámicos de Next.js como `src/app/recetas/[id]/` contienen corchetes que PowerShell interpreta como rangos de caracteres. Se resolvió usando la herramienta `read_file` del agente, que no pasa por la shell, o bien encerrando la ruta en comillas con escape `\[id\]` en comandos de búsqueda.
+- **`Select-String` no acepta `-Recurse` sobre arrays de rutas con glob:** en PowerShell, `Select-String` con múltiples patrones en `-Path` y `-Recurse` lanza un error de parámetro. Se resolvió con `Get-ChildItem -Recurse ... -Include "*.tsx","*.ts" | Select-String ...` para hacer la búsqueda en dos pasos.
+- **`Promise.all` rompía la página de favoritos ante un fallo individual:** si cualquiera de las N peticiones paralelas fallaba, toda la página mostraba error y las demás recetas se perdían. Se reemplazó por `Promise.allSettled` con lógica explícita para separar recetas resueltas de fallidas, mostrando un aviso inline en lugar de bloquear toda la vista.
